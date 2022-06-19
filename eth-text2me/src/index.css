@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  background: #171717;
+  color: #fff;
+  font-size: 14px;
+  font-family: -apple-system, Barlow, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: Barlow, source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
