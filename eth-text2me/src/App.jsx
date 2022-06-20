@@ -28,10 +28,10 @@ export default function App() {
         });
         setAllWaves(wavesCleaned);
       } else {
-        console.log("Objeto Ethereum inexistente!");
+        console.error("Objeto Ethereum inexistente!");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -71,25 +71,22 @@ export default function App() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        console.log("Garanta que possua a Metamask instalada!");
+        console.error("Garanta que possua a Metamask instalada!");
         return;
-      } else {
-        console.log("Temos o objeto ethereum", ethereum);
       }
 
       const accounts = await ethereum.request({ method: "eth_accounts" });
 
       if (accounts.length !== 0) {
         const account = accounts[0];
-        console.log("Encontrada a conta autorizada:", account);
         setCurrentAccount(account)
         getAllWaves();
 
       } else {
-        console.log("Nenhuma conta autorizada foi encontrada")
+        console.error("Nenhuma conta autorizada foi encontrada")
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -101,13 +98,11 @@ export default function App() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        alert("MetaMask encontrada!");
         return;
       }
 
       const accounts = await ethereum.request({ method: "eth_requestAccounts" });
 
-      console.log("Conectado", accounts[0]);
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error)
@@ -124,7 +119,7 @@ export default function App() {
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
  
         let count = await wavePortalContract.getTotalWaves();
-        console.log("Recuperado o número de tchauzinhos...", count.toNumber());
+        console.log("Recuperado o número de messages...", count.toNumber());
 
         /*
         * Executar o aceno a partir do contrato inteligente
@@ -136,19 +131,29 @@ export default function App() {
         console.log("Minerado -- ", waveTxn.hash);
 
         count = await wavePortalContract.getTotalWaves();
-        console.log("Total de tchauzinhos recuperado...", count.toNumber());
+        console.log("Total de messages recuperado...", count.toNumber());
         
       } else {
-        console.log("Objeto Ethereum não encontrado!");
+        console.error("Objeto Ethereum não encontrado!");
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
   useEffect(() => {
     checkIfWalletIsConnected();
   }, [])
+
+  useEffect(() => {
+    setAccountListener();
+  }, [window.ethereum])
+
+  const setAccountListener = () => {
+    window.ethereum.on("accountsChanged", (accounts) => {
+      !accounts.length ? setCurrentAccount("") : setCurrentAccount(accounts[0]);
+    });
+  }
 
   return (
     <div className="mainContainer">
@@ -157,45 +162,50 @@ export default function App() {
         <div className="header">
           Web3 Public Repository
         </div>
-
-        <div className="alert">
-          <p>Deployed on Goerli Testnet Network </p>
-          <p>Address: 0x64C189e96Eb2Dbb770991d4fF41f44582FfA0aC9 </p>
-        </div>
         
         {!currentAccount && (
-          <button id="connectWalletButton" className="waveButton" onClick={connectWallet}>
-            Connect
-          </button>
+          <>
+            <div className="alert">
+              <p>Deployed on Goerli Testnet Network </p>
+              <p>Address: 0x64C189e96Eb2Dbb770991d4fF41f44582FfA0aC9 </p>
+            </div>
+            <button id="connectWalletButton" className="waveButton" onClick={connectWallet}>
+              Connect
+            </button>
+          </>
         )}
 
-        <div className="title">
-          Share with us the best video/article you've ever seen about web3.
-        </div>
+        {currentAccount && (
+          <>
+            <div className="title">
+              Share with us the best video/article you've ever seen about web3.
+            </div>
 
-        <textarea
-          type="text"
-          className="waveTextArea"
-          placeholder=" Let me see your content"
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-        />
-        <button className="waveButton" onClick={() => {wave(); setMessage("")}}>
-          I want to send
-        </button>
+            <textarea
+              type="text"
+              className="waveTextArea"
+              placeholder=" Let me see your content"
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+            />
+            <button className="waveButton" onClick={() => {wave(); setMessage("")}}>
+              I want to send
+            </button>
 
-        <div className="title">
-          Our current content:
-        </div>
+            <div className="title">
+              Our current content:
+            </div>
 
-        {allWaves.map((wave, index) => {
-          return (
-            <div key={index} className="list">
-              <div>Address: <p>{wave.address}</p></div>
-              <div>Date: <p>{wave.timestamp.toString()}</p></div>
-              <div>Message: <p>{wave.message}</p></div>
-            </div>)
-        })}
+            {allWaves.map((wave, index) => {
+              return (
+                <div key={index} className="list">
+                  <div>Address: <p>{wave.address}</p></div>
+                  <div>Date: <p>{wave.timestamp.toString()}</p></div>
+                  <div>Message: <p>{wave.message}</p></div>
+                </div>)
+            })}
+          </>
+        )}
       </div>
       
     </div>
