@@ -1,4 +1,4 @@
-### <center>text2me</center>
+### text2me
 
 This dapp is a decentralized blog where users can post articles and recommendations about web3 for me and others.
 
